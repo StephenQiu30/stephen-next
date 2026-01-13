@@ -3,6 +3,8 @@
 import React from "react";
 import { AntdRegistry } from "@ant-design/nextjs-registry";
 import "./globals.css";
+import BasicLayout from "@/layouts/basic-layout";
+import { ReduxProvider } from "@/libs/providers";
 
 /**
  * 根布局组件
@@ -17,15 +19,12 @@ export default function RootLayout({
 }) {
   return (
     <html lang="zh-CN">
-      <head>
-        <meta charSet="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <title>Pro Admin - 中后台管理系统</title>
-      </head>
       <body>
-        <AntdRegistry>
-          {children}
-        </AntdRegistry>
+        <ReduxProvider>
+          <AntdRegistry>
+            <BasicLayout>{children}</BasicLayout>
+          </AntdRegistry>
+        </ReduxProvider>
       </body>
     </html>
   );
