@@ -374,12 +374,7 @@ declare namespace API {
   };
 
   type uploadFileParams = {
-    uploadFileRequest: UploadFileRequest;
-  };
-
-  type UploadFileRequest = {
-    /** 业务 */
-    biz?: string;
+    biz: string;
   };
 
   type User = {

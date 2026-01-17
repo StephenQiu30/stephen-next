@@ -16,8 +16,6 @@ export async function uploadFile(
     },
     params: {
       ...params,
-      uploadFileRequest: undefined,
-      ...params["uploadFileRequest"],
     },
     data: body,
     ...(options || {}),

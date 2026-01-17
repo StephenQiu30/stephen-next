@@ -35,7 +35,7 @@ const BasicLayout: React.FC<Props> = (props) => {
       title={TITLE}
       logo={<Image src={LOGO} width={32} height={32} alt={TITLE} />}
       location={{
-        pathname,
+        pathname: pathname ?? undefined,
       }}
       avatarProps={{
         size: "small",
