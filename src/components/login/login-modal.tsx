@@ -5,7 +5,6 @@ import Image from "next/image";
 import { AppDispatch } from "@/store";
 import { useDispatch } from "react-redux";
 import { setLoginUser } from "@/store/modules";
-import { LOGO, SUBTITLE, TITLE } from "@/constants";
 import { userLogin, userRegister } from "@/api/userController";
 import { LoginForm, ProFormText } from "@ant-design/pro-components";
 
@@ -80,9 +79,16 @@ const LoginModal: React.FC<LoginModalProps> = ({ open, onCancel }) => {
         <div className="space-y-6 p-8">
           <LoginForm
             form={form}
-            logo={<Image src={LOGO} alt={TITLE} width={44} height={44} />}
-            title={TITLE}
-            subTitle={SUBTITLE}
+            logo={
+              <Image
+                src={process.env.NEXT_PUBLIC_LOGO || "logo.svg"}
+                alt={process.env.NEXT_PUBLIC_TITLE || ""}
+                width={44}
+                height={44}
+              />
+            }
+            title={process.env.NEXT_PUBLIC_TITLE || ""}
+            subTitle={process.env.NEXT_PUBLIC_SUBTITLE || ""}
             onFinish={doLoginSubmit}
             submitter={{
               searchConfig: {

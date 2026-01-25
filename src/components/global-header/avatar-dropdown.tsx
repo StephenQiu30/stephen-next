@@ -1,10 +1,6 @@
 import React, { useState } from "react";
 import { Avatar, Button, Dropdown, Space } from "antd";
-import {
-  LogoutOutlined,
-  UserOutlined,
-  UserSwitchOutlined,
-} from "@ant-design/icons";
+import { LogoutOutlined, UserOutlined } from "@ant-design/icons";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "@/store";
 import { setLoginUser } from "@/store/modules";
@@ -41,7 +37,7 @@ const AvatarDropdown: React.FC<AvatarDropdownProps> = ({ currentUser }) => {
   ];
 
   return (
-    <div>
+    <>
       {currentUser?.id ? (
         <Dropdown
           menu={{ items: menuItems, onClick: loginOut }}
@@ -52,20 +48,15 @@ const AvatarDropdown: React.FC<AvatarDropdownProps> = ({ currentUser }) => {
           </Space>
         </Dropdown>
       ) : (
-        <>
-          <Button
-            type="text"
-            size={"large"}
-            onClick={() => setVisible(true)}
-            icon={<UserSwitchOutlined />}
-          />
-          <LoginRegisterModal
-            open={visible}
-            onCancel={() => setVisible(false)}
-          />
-        </>
+        <Button
+          type="text"
+          size="large"
+          onClick={() => setVisible(true)}
+          icon={<UserOutlined />}
+        />
       )}
-    </div>
+      <LoginRegisterModal open={visible} onCancel={() => setVisible(false)} />
+    </>
   );
 };
 

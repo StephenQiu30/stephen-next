@@ -1,11 +1,10 @@
 import axios from "axios";
-import { BASE_URL } from "@/constants";
 
 /**
  * 创建 Axios 示例
  */
 const request = axios.create({
-  baseURL: BASE_URL,
+  baseURL: process.env.NEXT_PUBLIC_BASE_URL,
   timeout: 10000,
   withCredentials: true,
 });

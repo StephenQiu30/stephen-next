@@ -4,14 +4,9 @@ import React from "react";
 import { AntdRegistry } from "@ant-design/nextjs-registry";
 import "./globals.css";
 import BasicLayout from "@/layouts/basic-layout";
-import { ReduxProvider } from "@/libs/providers";
+import store from "@/store";
+import { Provider } from "react-redux";
 
-/**
- * 根布局组件
- *
- * 使用 BasicLayout 作为全局布局
- * 包含 Ant Design SSR 支持
- */
 export default function RootLayout({
   children,
 }: {
@@ -20,11 +15,11 @@ export default function RootLayout({
   return (
     <html lang="zh-CN">
       <body>
-        <ReduxProvider>
+        <Provider store={store}>
           <AntdRegistry>
             <BasicLayout>{children}</BasicLayout>
           </AntdRegistry>
-        </ReduxProvider>
+        </Provider>
       </body>
     </html>
   );
