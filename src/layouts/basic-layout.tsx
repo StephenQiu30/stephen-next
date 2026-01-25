@@ -2,7 +2,7 @@
 import { ProLayout } from "@ant-design/pro-components";
 import React from "react";
 import Image from "next/image";
-import { GITHUB, LOGO, SUBTITLE, TITLE } from "@/constants";
+import { GITHUB, LOGO, TITLE } from "@/constants";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import GlobalFooter from "@/components/global-footer";
@@ -25,7 +25,6 @@ const BasicLayout: React.FC<Props> = (props) => {
   const { children } = props;
   const pathname = usePathname();
   const loginUser = useSelector((state: RootState) => state.loginUser);
-
 
   return (
     <ProLayout

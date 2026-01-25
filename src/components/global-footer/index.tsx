@@ -1,24 +1,36 @@
 import React from "react";
 import { DefaultFooter } from "@ant-design/pro-layout";
-import { GithubOutlined } from "@ant-design/icons";
+import { GithubOutlined, MailOutlined } from "@ant-design/icons";
 import { GITHUB, GITHUB_TITLE } from "@/constants";
 
-/**
- * 全局底部栏组件
- * @constructor
- */
 const GlobalFooter: React.FC = () => {
   const currentYear = new Date().getFullYear();
+  const email = process.env.NEXT_PUBLIC_EMAIL || "Popcornqhd@gmail.com";
+  const icp = process.env.NEXT_PUBLIC_ICP || "";
+
   return (
     <DefaultFooter
       className={"global-footer"}
-      copyright={`${GITHUB_TITLE} ${currentYear}`}
+      copyright={`${GITHUB_TITLE} ${currentYear}${icp ? ` | ${icp}` : ""}`}
       links={[
         {
           key: "Github",
-          title: <GithubOutlined />,
+          title: (
+            <>
+              <GithubOutlined /> Github
+            </>
+          ),
           href: GITHUB,
           blankTarget: true,
+        },
+        {
+          key: "Email",
+          title: (
+            <>
+              <MailOutlined /> Email
+            </>
+          ),
+          href: `mailto:${email}`,
         },
       ]}
     />
