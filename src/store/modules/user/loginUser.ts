@@ -4,10 +4,8 @@ export const loginUserSlice = createSlice({
   name: "loginUser",
   initialState: {} as API.LoginUserVO,
   reducers: {
-    setLoginUser: (state, action: PayloadAction<API.LoginUserVO>) => {
-      return {
-        ...action.payload,
-      };
+    setLoginUser: (state, action: PayloadAction<API.LoginUserVO | undefined>) => {
+      return action.payload || ({} as API.LoginUserVO);
     },
   },
 });

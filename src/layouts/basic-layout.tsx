@@ -81,13 +81,26 @@ const BasicLayout: React.FC<Props> = (props) => {
     <ConfigProvider
       theme={{
         algorithm: themeAlgorithm,
-        token: { colorPrimary: "#1890ff" },
+        token: {
+          colorPrimary: "#1677ff",
+          borderRadius: 8,
+        },
       }}
     >
       <ProLayout
-        layout={"top"}
-        contentWidth={"Fixed"}
+        layout="top"
+        contentWidth="Fixed"
         fixedHeader={true}
+        token={{
+          pageContainer: {
+            paddingInlinePageContainerContent: 0,
+            paddingBlockPageContainerContent: 0,
+          },
+          header: {
+            colorBgHeader: "rgba(255, 255, 255, 0.8)",
+          },
+        }}
+        siderMenuType="group"
         title={process.env.NEXT_PUBLIC_TITLE}
         logo={
           <Image
@@ -102,11 +115,25 @@ const BasicLayout: React.FC<Props> = (props) => {
         location={{ pathname: pathname ?? undefined }}
         headerTitleRender={(logo) => (
           <div
-            style={{ display: "flex", alignItems: "center", cursor: "pointer" }}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              cursor: "pointer",
+              transition: "all 0.3s ease",
+            }}
             onClick={() => router.push("/")}
           >
             {logo}
-            <span style={{ marginLeft: 8, fontWeight: 600, fontSize: 18 }}>
+            <span
+              style={{
+                marginLeft: 12,
+                fontWeight: 700,
+                fontSize: 20,
+                background: "linear-gradient(135deg, #1677ff 0%, #0958d9 100%)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+              }}
+            >
               {process.env.NEXT_PUBLIC_TITLE || "StephenQiu30"}
             </span>
           </div>
@@ -116,8 +143,16 @@ const BasicLayout: React.FC<Props> = (props) => {
         actionsRender={(props) => {
           if (props.isMobile) return [];
           return (
-            <Space size={8}>
-              <Button type="text" icon={<SearchOutlined />} size="large" />
+            <Space size="middle">
+              <Button
+                type="text"
+                icon={<SearchOutlined />}
+                size="large"
+                style={{
+                  borderRadius: 8,
+                  transition: "all 0.3s ease",
+                }}
+              />
               <Button
                 type="text"
                 icon={<GithubOutlined />}
@@ -125,19 +160,34 @@ const BasicLayout: React.FC<Props> = (props) => {
                 onClick={() =>
                   window.open(process.env.NEXT_PUBLIC_GITHUB, "_blank")
                 }
+                style={{
+                  borderRadius: 8,
+                  transition: "all 0.3s ease",
+                }}
               />
               <Button
                 type="text"
                 icon={isDarkMode ? <SunOutlined /> : <MoonOutlined />}
                 size="large"
                 onClick={() => setIsDarkMode(!isDarkMode)}
+                style={{
+                  borderRadius: 8,
+                  transition: "all 0.3s ease",
+                }}
               />
               <AvatarDropdown currentUser={loginUser} />
             </Space>
           );
         }}
         menuItemRender={(item, dom) => (
-          <Link href={item.path || "/"}>{dom}</Link>
+          <Link
+            href={item.path || "/"}
+            style={{
+              transition: "all 0.3s ease",
+            }}
+          >
+            {dom}
+          </Link>
         )}
       >
         {children}

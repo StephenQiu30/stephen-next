@@ -11,6 +11,7 @@
 !.yarn/versions
 /.trae
 /.shared
+/.claude
 
 # testing
 /coverage
