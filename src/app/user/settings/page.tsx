@@ -81,6 +81,10 @@ const Settings: React.FC = () => {
       setLoading(true);
       const { checkPassword, ...submitValues } = values;
 
+      if (!submitValues.userPassword) {
+        delete submitValues.userPassword;
+      }
+
       const res: any = await updateMyUser(submitValues);
 
       if (res.code === 0) {
