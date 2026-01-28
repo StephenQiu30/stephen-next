@@ -142,6 +142,8 @@ declare namespace API {
     userRole?: string;
     /** 用户邮箱 */
     userEmail?: string;
+    /** 用户电话 */
+    userPhone?: string;
     /** 创建时间 */
     createTime?: string;
     /** 更新时间 */

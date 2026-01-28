@@ -1,4 +1,8 @@
-import axios, { AxiosInstance, AxiosRequestConfig, InternalAxiosRequestConfig } from "axios";
+import axios, {
+  AxiosInstance,
+  AxiosRequestConfig,
+  InternalAxiosRequestConfig,
+} from "axios";
 
 /**
  * 创建 Axios 实例
@@ -14,7 +18,10 @@ const instance: AxiosInstance = axios.create({
  */
 instance.interceptors.request.use(
   function (config: InternalAxiosRequestConfig) {
-    const token = typeof window !== "undefined" ? localStorage.getItem("stephen-next-token") : null;
+    const token =
+      typeof window !== "undefined"
+        ? localStorage.getItem("stephen-next-token")
+        : null;
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -50,16 +57,16 @@ instance.interceptors.response.use(
  * 1. request<T>(url, config)
  * 2. request<T>(config)
  */
-const request = async <T = any>(
+const request = async <T = never>(
   urlOrConfig: string | AxiosRequestConfig,
-  config?: AxiosRequestConfig
+  config?: AxiosRequestConfig,
 ): Promise<T> => {
   if (typeof urlOrConfig === "string") {
     // request(url, config) 形式
-    return await instance({ ...config, url: urlOrConfig }) as Promise<T>;
+    return (await instance({ ...config, url: urlOrConfig })) as Promise<T>;
   } else {
     // request(config) 形式
-    return await instance(urlOrConfig) as Promise<T>;
+    return (await instance(urlOrConfig)) as Promise<T>;
   }
 };
 
