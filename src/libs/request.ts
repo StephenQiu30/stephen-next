@@ -1,9 +1,9 @@
-import axios from "axios";
+import axios, { AxiosInstance, AxiosRequestConfig, InternalAxiosRequestConfig } from "axios";
 
 /**
- * 创建 Axios 示例
+ * 创建 Axios 实例
  */
-const request = axios.create({
+const instance: AxiosInstance = axios.create({
   baseURL: process.env.NEXT_PUBLIC_BASE_URL,
   timeout: 10000,
   withCredentials: true,
@@ -12,16 +12,11 @@ const request = axios.create({
 /**
  * 创建请求拦截器
  */
-request.interceptors.request.use(
-  function (config) {
-    const token = localStorage.getItem("stephen-next-token");
+instance.interceptors.request.use(
+  function (config: InternalAxiosRequestConfig) {
+    const token = typeof window !== "undefined" ? localStorage.getItem("stephen-next-token") : null;
     if (token) {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-expect-error
-      config.headers = {
-        ...config.headers,
-        Authorization: `Bearer ${token}`,
-      };
+      config.headers.Authorization = `Bearer ${token}`;
     }
     // 请求执行前执行
     return config;
@@ -35,7 +30,7 @@ request.interceptors.request.use(
 /**
  * 创建响应拦截器
  */
-request.interceptors.response.use(
+instance.interceptors.response.use(
   // 2xx 响应触发
   function (response) {
     // 处理响应数据
@@ -48,5 +43,24 @@ request.interceptors.response.use(
     return Promise.reject(error);
   },
 );
+
+/**
+ * 封装request函数，添加泛型支持
+ * 支持两种调用方式：
+ * 1. request<T>(url, config)
+ * 2. request<T>(config)
+ */
+const request = async <T = any>(
+  urlOrConfig: string | AxiosRequestConfig,
+  config?: AxiosRequestConfig
+): Promise<T> => {
+  if (typeof urlOrConfig === "string") {
+    // request(url, config) 形式
+    return await instance({ ...config, url: urlOrConfig }) as Promise<T>;
+  } else {
+    // request(config) 形式
+    return await instance(urlOrConfig) as Promise<T>;
+  }
+};
 
 export default request;

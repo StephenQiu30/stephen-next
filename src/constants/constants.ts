@@ -1,0 +1,1 @@
+export const GITHUB = process.env.NEXT_PUBLIC_GITHUB || "https://github.com/";
