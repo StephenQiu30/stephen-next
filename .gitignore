@@ -12,6 +12,7 @@
 /.trae
 /.shared
 /.claude
+/.cursor
 
 # testing
 /coverage

@@ -1,7 +1,7 @@
 import React from "react";
 import { Button } from "antd";
 import { GithubOutlined, SearchOutlined } from "@ant-design/icons";
-import { GITHUB } from "@/constants";
+import { GITHUB } from "@/constants/constants";
 
 interface HeaderRightProps {}
 

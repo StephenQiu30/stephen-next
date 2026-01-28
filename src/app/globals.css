@@ -9,3 +9,6 @@ body {
   max-width: 100vw;
   max-height: 100vh;
 }
+
+/* Agentic UI 样式 */
+@import '@ant-design/agentic-ui/dist/root.css';

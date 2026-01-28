@@ -45,9 +45,15 @@ const BasicLayout: React.FC<Props> = (props) => {
         const res: any = await getLoginUser();
         if (res.code === 0 && res.data) {
           dispatch(setLoginUser(res.data));
+        } else {
+          // API返回错误，清除token
+          localStorage.removeItem("stephen-next-token");
+          dispatch(setLoginUser(undefined));
         }
       } catch (error) {
+        // 请求失败，清除token并重置状态
         localStorage.removeItem("stephen-next-token");
+        dispatch(setLoginUser(undefined));
         console.error("Failed to get user info:", error);
       } finally {
         setLoading(false);
