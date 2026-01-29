@@ -1,30 +1,99 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { useSelector } from "react-redux";
-import { RootState } from "@/store";
-import { ProCard, ProForm, ProFormText, PageContainer, ProFormGroup } from "@ant-design/pro-components";
-import { Button, Upload, Avatar, App } from "antd";
+import { useSelector, useDispatch } from "react-redux";
+import { RootState, AppDispatch } from "@/store";
+import { ProForm, ProFormText, PageContainer, ProCard } from "@ant-design/pro-components";
+import { Button, Upload, Avatar, App, Tabs, Space, Tooltip } from "antd";
 import {
   SaveOutlined,
   UserOutlined,
   LockOutlined,
   MailOutlined,
   PhoneOutlined,
-  UploadOutlined,
+  CameraOutlined,
+  SafetyOutlined,
+  IdcardOutlined,
 } from "@ant-design/icons";
 import { updateMyUser, getLoginUser } from "@/api/userController";
 import { uploadFile } from "@/api/fileController";
-import { useDispatch } from "react-redux";
-import { AppDispatch } from "@/store";
 import { setLoginUser } from "@/store/modules";
+import { createStyles } from "antd-style";
+import { motion } from "framer-motion";
+
+const useStyles = createStyles(({ token, css }) => ({
+  container: css`
+    max-width: 800px;
+    margin: 0 auto;
+  `,
+  settingsCard: css`
+    border-radius: ${token.borderRadiusLG}px;
+    border: none;
+    box-shadow: ${token.boxShadowTertiary};
+    background: ${token.colorBgContainer};
+  `,
+  avatarSection: css`
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 32px;
+    padding: 24px;
+    background: ${token.colorFillAlter};
+    border-radius: ${token.borderRadiusLG}px;
+  `,
+  avatarWrapper: css`
+    position: relative;
+    cursor: pointer;
+    transition: all ${token.motionDurationMid};
+    &:hover .avatar-mask {
+      opacity: 1;
+    }
+  `,
+  avatarMask: css`
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: ${token.colorBgMask};
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #fff;
+    opacity: 0;
+    transition: opacity ${token.motionDurationMid};
+    font-size: 24px;
+  `,
+  tabLabel: css`
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 0;
+  `,
+  submitButton: css`
+    height: 44px;
+    border-radius: 22px;
+    font-weight: 600;
+    margin-top: 16px;
+    border: none;
+    background: linear-gradient(135deg, ${token.colorPrimary} 0%, ${token.colorPrimaryActive} 100%);
+    box-shadow: 0 4px 12px ${token.colorPrimaryHover}40;
+    &:hover {
+      box-shadow: 0 6px 16px ${token.colorPrimaryHover}60;
+      transform: translateY(-1px);
+    }
+  `,
+}));
 
 const Settings: React.FC = () => {
+  const { styles, theme } = useStyles();
   const dispatch = useDispatch<AppDispatch>();
   const loginUser = useSelector((state: RootState) => state.loginUser);
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState(loginUser?.userAvatar || "");
+  const [activeTab, setActiveTab] = useState("basic");
   const [form] = ProForm.useForm();
   const { message } = App.useApp();
 
@@ -44,36 +113,29 @@ const Settings: React.FC = () => {
     return null;
   }
 
-  const handleAvatarUpload = async (info: any) => {
-    const { fileList } = info;
-    if (fileList && fileList.length > 0) {
-      const file = fileList[0].originFileObj as File;
-      if (file) {
-        try {
-          setUploading(true);
-          const formData = new FormData();
-          formData.append("file", file);
+  const handleAvatarUpload = async (file: File) => {
+    try {
+      setUploading(true);
+      const formData = new FormData();
+      formData.append("file", file);
 
-          const res: any = await uploadFile(
-            { biz: "user_avatar" },
-            formData
-          );
+      const res: any = await uploadFile({ biz: "user_avatar" }, formData);
 
-          if (res.code === 0 && res.data) {
-            setAvatarUrl(res.data);
-            form.setFieldValue("userAvatar", res.data);
-            message.success("头像上传成功");
-          } else {
-            message.error(res.message || "头像上传失败");
-          }
-        } catch (error) {
-          console.error("头像上传失败:", error);
-          message.error("头像上传失败");
-        } finally {
-          setUploading(false);
-        }
+      if (res.code === 0 && res.data) {
+        setAvatarUrl(res.data);
+        form.setFieldValue("userAvatar", res.data);
+        message.success("头像上传成功");
+        return res.data;
+      } else {
+        message.error(res.message || "头像上传失败");
       }
+    } catch (error) {
+      console.error("头像上传失败:", error);
+      message.error("头像上传失败");
+    } finally {
+      setUploading(false);
     }
+    return null;
   };
 
   const handleSubmit = async (values: any) => {
@@ -88,7 +150,7 @@ const Settings: React.FC = () => {
       const res: any = await updateMyUser(submitValues);
 
       if (res.code === 0) {
-        message.success("更新成功");
+        message.success("个人信息更新成功");
 
         const userRes: any = await getLoginUser();
         if (userRes.code === 0 && userRes.data) {
@@ -110,163 +172,202 @@ const Settings: React.FC = () => {
     }
   };
 
-  return (
-    <PageContainer title={false} breadcrumb={undefined}>
-      <ProCard title="个人设置" headerBordered>
-        <ProForm
-          form={form}
-          onFinish={handleSubmit}
-          layout="vertical"
-          initialValues={{
-            userName: loginUser.userName,
-            userAvatar: loginUser.userAvatar,
-            userEmail: loginUser.userEmail,
-          }}
-          submitter={{
-            searchConfig: {
-              submitText: "保存修改",
-            },
-            resetButtonProps: {
-              style: { display: "none" },
-            },
-            submitButtonProps: {
-              loading,
-              size: "large",
-              icon: <SaveOutlined />,
-              block: true,
-            },
-          }}
+  const items = [
+    {
+      key: "basic",
+      label: (
+        <span className={styles.tabLabel}>
+          <IdcardOutlined /> 基本信息
+        </span>
+      ),
+      children: (
+        <motion.div
+          initial={{ opacity: 0, x: -10 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.3 }}
         >
-          <ProFormGroup
-            title="基本信息"
-            tooltip="修改您的个人基本信息"
-            collapsible
-            defaultCollapsed={false}
-          >
-            <div style={{ display: "flex", alignItems: "center", marginBottom: 24 }}>
-              <Avatar size={80} src={avatarUrl} icon={<UserOutlined />} />
-              <div style={{ marginLeft: 24, flex: 1 }}>
-                <Upload
-                  listType="picture"
-                  maxCount={1}
-                  beforeUpload={() => false}
-                  onChange={handleAvatarUpload}
-                  disabled={uploading}
-                  showUploadList={false}
-                >
-                  <Button icon={<UploadOutlined />} loading={uploading}>
-                    更换头像
-                  </Button>
-                </Upload>
-              </div>
+          <div className={styles.avatarSection}>
+            <Upload
+              showUploadList={false}
+              beforeUpload={(file) => {
+                handleAvatarUpload(file);
+                return false;
+              }}
+              disabled={uploading}
+            >
+              <Tooltip title="点击更换头像">
+                <div className={styles.avatarWrapper}>
+                  <Avatar
+                    size={100}
+                    src={avatarUrl}
+                    icon={<UserOutlined />}
+                    style={{ border: `4px solid ${theme.colorBgContainer}`, boxShadow: theme.boxShadowTertiary }}
+                  />
+                  <div className={`avatar-mask ${styles.avatarMask}`}>
+                    <CameraOutlined />
+                  </div>
+                </div>
+              </Tooltip>
+            </Upload>
+            <div style={{ marginTop: 12, color: theme.colorTextDescription, fontSize: 12 }}>
+              支持 JPG、PNG 格式，大小不超过 2MB
             </div>
+          </div>
 
-            <ProFormText
-              name="userName"
-              label="用户名"
-              placeholder="请输入用户名"
-              fieldProps={{
-                prefix: <UserOutlined />,
-                size: "large",
-              }}
-              rules={[
-                { required: true, message: "请输入用户名" },
-                { min: 2, max: 20, message: "用户名长度为 2-20 个字符" },
-              ]}
-            />
-          </ProFormGroup>
+          <ProFormText name="userAvatar" hidden />
 
-          <ProFormGroup
-            title="安全设置"
-            tooltip="修改您的密码"
-            collapsible
-            defaultCollapsed={false}
-          >
-            <ProFormText.Password
-              name="userPassword"
-              label="新密码"
-              placeholder="不修改请留空"
-              fieldProps={{
-                prefix: <LockOutlined />,
-                size: "large",
-              }}
-              rules={[
-                {
-                  min: 6,
-                  message: "密码长度至少 6 个字符",
+          <ProFormText
+            name="userName"
+            label="用户昵称"
+            placeholder="设置您的个性化昵称"
+            fieldProps={{
+              prefix: <UserOutlined style={{ color: theme.colorPrimary }} />,
+              size: "large",
+            }}
+            rules={[
+              { required: true, message: "请输入用户昵称" },
+              { min: 2, max: 20, message: "昵称长度为 2-20 个字符" },
+            ]}
+          />
+        </motion.div>
+      ),
+    },
+    {
+      key: "security",
+      label: (
+        <span className={styles.tabLabel}>
+          <SafetyOutlined /> 安全设置
+        </span>
+      ),
+      children: (
+        <motion.div
+          initial={{ opacity: 0, x: -10 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.3 }}
+        >
+          <ProFormText.Password
+            name="userPassword"
+            label="重置密码"
+            placeholder="若不修改密码请留空"
+            fieldProps={{
+              prefix: <LockOutlined style={{ color: theme.colorPrimary }} />,
+              size: "large",
+            }}
+            rules={[{ min: 6, message: "密码长度至少 6 个字符" }]}
+          />
+
+          <ProFormText.Password
+            name="checkPassword"
+            label="确认新密码"
+            placeholder="请再次输入新密码"
+            dependencies={["userPassword"]}
+            fieldProps={{
+              prefix: <LockOutlined style={{ color: theme.colorPrimary }} />,
+              size: "large",
+            }}
+            rules={[
+              ({ getFieldValue }) => ({
+                validator(_, value) {
+                  const password = getFieldValue("userPassword");
+                  if (!password) return Promise.resolve();
+                  if (!value) return Promise.reject(new Error("请确认您的密码"));
+                  if (password !== value) return Promise.reject(new Error("两次输入的密码不一致"));
+                  return Promise.resolve();
                 },
-              ]}
-            />
+              }),
+            ]}
+          />
+        </motion.div>
+      ),
+    },
+    {
+      key: "contact",
+      label: (
+        <span className={styles.tabLabel}>
+          <MailOutlined /> 联系方式
+        </span>
+      ),
+      children: (
+        <motion.div
+          initial={{ opacity: 0, x: -10 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.3 }}
+        >
+          <ProFormText
+            name="userEmail"
+            label="电子邮箱"
+            placeholder="example@stephen.com"
+            fieldProps={{
+              prefix: <MailOutlined style={{ color: theme.colorPrimary }} />,
+              size: "large",
+            }}
+            rules={[{ type: "email", message: "请输入格式正确的邮箱地址" }]}
+          />
 
-            <ProFormText.Password
-              name="checkPassword"
-              label="确认密码"
-              placeholder="请再次输入新密码"
-              dependencies={["userPassword"]}
-              fieldProps={{
-                prefix: <LockOutlined />,
-                size: "large",
-              }}
-              rules={[
-                ({ getFieldValue }) => ({
-                  validator(_, value) {
-                    const password = getFieldValue("userPassword");
-                    if (!password) {
-                      return Promise.resolve();
-                    }
-                    if (!value) {
-                      return Promise.reject(new Error("请再次输入密码"));
-                    }
-                    if (password !== value) {
-                      return Promise.reject(new Error("两次输入的密码不一致"));
-                    }
-                    return Promise.resolve();
-                  },
-                }),
-              ]}
-            />
-          </ProFormGroup>
+          <ProFormText
+            name="userPhone"
+            label="手机号码"
+            placeholder="请输入您的手机号"
+            fieldProps={{
+              prefix: <PhoneOutlined style={{ color: theme.colorPrimary }} />,
+              size: "large",
+            }}
+            rules={[
+              {
+                pattern: /^1[3-9]\d{9}$/,
+                message: "请输入有效的 11 位手机号码",
+              },
+            ]}
+          />
+        </motion.div>
+      ),
+    },
+  ];
 
-          <ProFormGroup
-            title="联系方式"
-            tooltip="更新您的联系信息"
-            collapsible
-            defaultCollapsed={false}
-          >
-            <ProFormText
-              name="userEmail"
-              label="邮箱"
-              placeholder="请输入邮箱"
-              fieldProps={{
-                prefix: <MailOutlined />,
-                size: "large",
+  return (
+    <PageContainer title={false}>
+      <div className={styles.container}>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          <ProCard className={styles.settingsCard}>
+            <ProForm
+              form={form}
+              onFinish={handleSubmit}
+              layout="vertical"
+              submitter={{
+                render: (_, dom) => (
+                  <div style={{ marginTop: 24 }}>
+                    <Button
+                      type="primary"
+                      htmlType="submit"
+                      loading={loading}
+                      block
+                      className={styles.submitButton}
+                      icon={<SaveOutlined />}
+                    >
+                      同步更新所有设置
+                    </Button>
+                  </div>
+                ),
               }}
-              rules={[
-                {
-                  type: "email",
-                  message: "请输入有效的邮箱地址",
-                },
-              ]}
-            />
-
-            <ProFormText
-              name="userPhone"
-              label="电话"
-              placeholder="请输入电话号码"
-              fieldProps={{
-                prefix: <PhoneOutlined />,
-                size: "large",
-              }}
-              rules={[
-                {
-                  pattern: /^1[3-9]\d{9}$/,
-                  message: "请输入有效的手机号码",
-                },
-              ]}
-            />
-          </ProFormGroup>
-        </ProForm>
-      </ProCard>
+            >
+              <h2 style={{ fontSize: 24, fontWeight: 700, marginBottom: 24, color: theme.colorTextHeading }}>
+                个人设置
+              </h2>
+              <Tabs
+                activeKey={activeTab}
+                onChange={setActiveTab}
+                items={items}
+                size="large"
+                tabBarStyle={{ marginBottom: 32 }}
+              />
+            </ProForm>
+          </ProCard>
+        </motion.div>
+      </div>
     </PageContainer>
   );
 };
