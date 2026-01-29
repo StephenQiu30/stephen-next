@@ -12,7 +12,7 @@ export async function uploadFile(
   return request<API.BaseResponseString>("/file/upload", {
     method: "POST",
     headers: {
-      "Content-Type": "application/json",
+      "Content-Type": "multipart/form-data",
     },
     params: {
       ...params,
