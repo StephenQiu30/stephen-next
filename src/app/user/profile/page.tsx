@@ -3,103 +3,177 @@
 import React from "react";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
-import { Avatar, Button, Tag, Space, Card, Divider } from "antd";
+import { Avatar, Button, Typography, Space, Tooltip } from "antd";
 import {
   UserOutlined,
   EditOutlined,
   MailOutlined,
-  IdcardOutlined,
-  ClockCircleOutlined,
-  GlobalOutlined,
   SafetyCertificateOutlined,
+  GlobalOutlined,
+  CalendarOutlined,
+  IdcardOutlined,
 } from "@ant-design/icons";
 import { useRouter } from "next/navigation";
-import {
-  PageContainer,
-  ProDescriptions,
-  ProCard,
-} from "@ant-design/pro-components";
+import { PageContainer } from "@ant-design/pro-components";
 import { createStyles } from "antd-style";
 import { motion } from "framer-motion";
 
-const useStyles = createStyles(({ token, css }) => ({
-  container: css`
-    max-width: 900px;
-    margin: 0 auto;
-  `,
-  profileCard: css`
-    overflow: hidden;
-    border-radius: ${token.borderRadiusLG}px;
-    border: none;
-    box-shadow: ${token.boxShadowTertiary};
-    background: ${token.colorBgContainer};
-  `,
-  banner: css`
-    height: 180px;
-    background: linear-gradient(
-      135deg,
-      ${token.colorPrimary} 0%,
-      ${token.colorPrimaryActive} 100%
-    );
-    position: relative;
+const { Title, Text } = Typography;
+
+const useStyles = createStyles(({ token, css, isDarkMode }) => ({
+  pageContainer: css`
+    min-height: 80vh;
     display: flex;
     justify-content: center;
-    align-items: flex-end;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+  `,
+  ambientBackground: css`
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle at 50% 50%, 
+      ${token.colorPrimary || "rgba(24, 144, 255, 0.15)"} 0%, 
+      rgba(255, 255, 255, 0) 50%
+    );
+    filter: blur(80px);
+    z-index: 0;
+    pointer-events: none;
+    animation: pulse 10s ease-in-out infinite alternate;
+    @keyframes pulse {
+      0% { transform: scale(1); opacity: 0.5; }
+      100% { transform: scale(1.1); opacity: 0.8; }
+    }
+  `,
+  glassPanel: css`
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 800px;
+    background: ${isDarkMode ? "rgba(28, 28, 30, 0.65)" : "rgba(255, 255, 255, 0.65)"};
+    backdrop-filter: blur(40px) saturate(180%);
+    -webkit-backdrop-filter: blur(40px) saturate(180%);
+    border: 1px solid ${isDarkMode ? "rgba(255,255,255,0.1)" : "rgba(255,255,255,0.4)"};
+    border-radius: 32px;
+    padding: 48px;
+    box-shadow: 
+      0 20px 40px -8px rgba(0, 0, 0, 0.12),
+      0 12px 24px -6px rgba(0, 0, 0, 0.04),
+      inset 0 1px 0 rgba(255,255,255,0.3);
+    
+    @media (max-width: 576px) {
+      padding: 32px 24px;
+      border-radius: 24px;
+    }
+  `,
+  header: css`
+    display: flex;
+    align-items: center;
+    gap: 32px;
+    margin-bottom: 48px;
+    @media (max-width: 576px) {
+      flex-direction: column;
+      text-align: center;
+      gap: 24px;
+    }
   `,
   avatarWrapper: css`
-    position: absolute;
-    bottom: -50px;
-    padding: 6px;
-    background: ${token.colorBgContainer};
+    position: relative;
     border-radius: 50%;
-    box-shadow: ${token.boxShadowSecondary};
+    padding: 4px;
+    background: ${isDarkMode ? "rgba(255,255,255,0.1)" : "rgba(255,255,255,0.5)"};
+    box-shadow: 0 8px 24px rgba(0,0,0,0.08);
   `,
-  content: css`
-    padding-top: 60px;
-    padding-bottom: 32px;
-    text-align: center;
+  avatar: css`
+    box-shadow: inset 0 0 0 1px rgba(0,0,0,0.05);
+  `,
+  userInfo: css`
+    flex: 1;
   `,
   userName: css`
-    font-size: 28px;
-    font-weight: 700;
-    color: ${token.colorTextHeading};
-    margin: 8px 0 4px;
+    font-size: 32px !important;
+    font-weight: 700 !important;
+    margin: 0 !important;
+    letter-spacing: -0.02em;
+    background: ${isDarkMode
+      ? "linear-gradient(135deg, #fff 0%, #aaa 100%)"
+      : "linear-gradient(135deg, #333 0%, #666 100%)"};
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
   `,
-  userEmail: css`
-    color: ${token.colorTextDescription};
-    font-size: 15px;
-    margin-bottom: 16px;
+  userRole: css`
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 8px;
+    padding: 6px 12px;
+    border-radius: 999px;
+    background: ${token.colorFillTertiary};
+    color: ${token.colorTextSecondary};
+    font-weight: 600;
+    font-size: 13px;
+  `,
+  editButton: css`
+    height: 40px;
+    padding: 0 24px;
+    border-radius: 999px;
+    border: none;
+    font-weight: 600;
+    background: ${token.colorText};
+    color: ${token.colorBgContainer};
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    &:hover {
+      transform: scale(1.05);
+      background: ${token.colorText};
+      opacity: 0.9;
+      color: ${token.colorBgContainer} !important;
+    }
+  `,
+  statsGrid: css`
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+  `,
+  statCard: css`
+    background: ${isDarkMode ? "rgba(255,255,255,0.05)" : "rgba(255,255,255,0.5)"};
+    border-radius: 20px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
+    &:hover {
+      background: ${isDarkMode ? "rgba(255,255,255,0.08)" : "rgba(255,255,255,0.8)"};
+      border-color: ${token.colorBorderSecondary};
+      transform: translateY(-2px);
+    }
+  `,
+  statIcon: css`
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
+    font-size: 18px;
   `,
-  infoSection: css`
-    margin-top: 32px;
-    padding: 0 40px;
-    @media (max-width: 576px) {
-      padding: 0 16px;
-    }
-  `,
-  editButton: css`
-    border-radius: 20px;
-    height: 40px;
-    padding: 0 24px;
-    font-weight: 600;
-    margin-top: 16px;
-    border: none;
-    box-shadow: 0 2px 8px ${token.colorPrimaryHover}40;
-    &:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 4px 12px ${token.colorPrimaryHover}60;
-    }
-  `,
-  tag: css`
-    margin-top: 8px;
-    padding: 2px 12px;
-    border-radius: 12px;
+  statLabel: css`
+    font-size: 13px;
+    color: ${token.colorTextSecondary};
     font-weight: 500;
   `,
+  statValue: css`
+    font-size: 15px;
+    font-weight: 600;
+    color: ${token.colorText};
+    overflow: hidden;
+    text-overflow: ellipsis;
+  `
 }));
 
 const Profile: React.FC = () => {
@@ -110,116 +184,111 @@ const Profile: React.FC = () => {
   if (!loginUser?.id) {
     return null;
   }
-
   const getRoleInfo = (role?: string) => {
     switch (role) {
       case "admin":
         return {
           label: "管理员",
-          color: "gold",
           icon: <SafetyCertificateOutlined />,
+          bg: theme.geekblue,
         };
       case "user":
-        return { label: "普通用户", color: "blue", icon: <UserOutlined /> };
+        return {
+          label: "普通用户",
+          icon: <UserOutlined />,
+          bg: theme.green,
+        };
       default:
         return {
-          label: "未知角色",
-          color: "default",
+          label: "访客",
           icon: <GlobalOutlined />,
+          bg: theme.colorTextSecondary,
         };
     }
   };
 
   const roleInfo = getRoleInfo(loginUser.userRole);
 
+  const stats = [
+    {
+      label: "电子邮箱",
+      value: loginUser.userEmail || "未设置",
+      icon: <MailOutlined style={{ color: "#007AFF" }} />,
+      bg: "rgba(0, 122, 255, 0.1)",
+    },
+    {
+      label: "用户 ID",
+      value: loginUser.id,
+      icon: <IdcardOutlined style={{ color: "#5856D6" }} />,
+      bg: "rgba(88, 86, 214, 0.1)",
+    },
+    {
+      label: "注册时间",
+      value: loginUser.createTime ? new Date(loginUser.createTime).toLocaleDateString() : "未知",
+      icon: <CalendarOutlined style={{ color: "#FF9500" }} />,
+      bg: "rgba(255, 149, 0, 0.1)",
+    }
+  ];
+
   return (
-    <PageContainer title={false}>
-      <div className={styles.container}>
+    <PageContainer title={false} ghost>
+      <div className={styles.pageContainer}>
+        <div className={styles.ambientBackground} />
+
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
+          initial={{ opacity: 0, scale: 0.96, y: 20 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+          className={styles.glassPanel}
         >
-          <ProCard className={styles.profileCard} bodyStyle={{ padding: 0 }}>
-            <div className={styles.banner}>
-              <div className={styles.avatarWrapper}>
-                <Avatar
-                  size={100}
-                  src={loginUser.userAvatar}
-                  icon={<UserOutlined />}
-                  style={{ border: `4px solid ${theme.colorBgContainer}` }}
-                />
-              </div>
+          <div className={styles.header}>
+            <div className={styles.avatarWrapper}>
+              <Avatar
+                size={100}
+                src={loginUser.userAvatar}
+                className={styles.avatar}
+                icon={<UserOutlined />}
+              />
             </div>
-
-            <div className={styles.content}>
-              <h2 className={styles.userName}>{loginUser.userName}</h2>
-              <div className={styles.userEmail}>
-                <MailOutlined style={{ color: theme.colorPrimary }} />
-                {loginUser.userEmail || "未设置邮箱"}
-              </div>
-              <Tag
-                color={roleInfo.color}
-                className={styles.tag}
-                icon={roleInfo.icon}
-              >
+            <div className={styles.userInfo}>
+              <Title level={1} className={styles.userName}>{loginUser.userName}</Title>
+              <div className={styles.userRole}>
+                {roleInfo.icon}
                 {roleInfo.label}
-              </Tag>
-
-              <div>
-                <Button
-                  type="primary"
-                  icon={<EditOutlined />}
-                  onClick={() => router.push("/user/settings")}
-                  className={styles.editButton}
-                >
-                  编辑个人资料
-                </Button>
-              </div>
-
-              <div className={styles.infoSection}>
-                <Divider style={{ borderColor: theme.colorBorderSecondary }}>
-                  账户详细信息
-                </Divider>
-                <ProDescriptions
-                  column={{ xxl: 2, xl: 2, lg: 2, md: 1, sm: 1, xs: 1 }}
-                  dataSource={loginUser}
-                  columns={[
-                    {
-                      title: "用户 ID",
-                      dataIndex: "id",
-                      render: (text) => (
-                        <code
-                          style={{
-                            background: theme.colorFillAlter,
-                            padding: "2px 6px",
-                            borderRadius: "4px",
-                            color: theme.colorTextSecondary,
-                          }}
-                        >
-                          {text}
-                        </code>
-                      ),
-                    },
-                    {
-                      title: "账户状态",
-                      render: () => <Tag color="success">正常</Tag>,
-                    },
-                    {
-                      title: "加入时间",
-                      dataIndex: "createTime",
-                      valueType: "dateTime",
-                    },
-                    {
-                      title: "上次更新",
-                      dataIndex: "updateTime",
-                      valueType: "dateTime",
-                    },
-                  ]}
-                />
               </div>
             </div>
-          </ProCard>
+            <div>
+              <Button
+                className={styles.editButton}
+                icon={<EditOutlined />}
+                onClick={() => router.push("/user/settings")}
+              >
+                编辑
+              </Button>
+            </div>
+          </div>
+
+          <div className={styles.statsGrid}>
+            {stats.map((stat, index) => (
+              <motion.div
+                key={stat.label}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1 + index * 0.05 }}
+                className={styles.statCard}
+              >
+                <div className={styles.statIcon} style={{ background: stat.bg }}>
+                  {stat.icon}
+                </div>
+                <div>
+                  <div className={styles.statLabel}>{stat.label}</div>
+                  <Tooltip title={stat.value}>
+                    <div className={styles.statValue}>{stat.value}</div>
+                  </Tooltip>
+                </div>
+              </motion.div>
+            ))}
+          </div>
         </motion.div>
       </div>
     </PageContainer>
