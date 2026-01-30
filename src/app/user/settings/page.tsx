@@ -3,7 +3,12 @@
 import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState, AppDispatch } from "@/store";
-import { ProForm, ProFormText, PageContainer, ProCard } from "@ant-design/pro-components";
+import {
+  ProForm,
+  ProFormText,
+  PageContainer,
+  ProCard,
+} from "@ant-design/pro-components";
 import { Button, Upload, Avatar, App, Tabs, Space, Tooltip } from "antd";
 import {
   SaveOutlined,
@@ -77,7 +82,11 @@ const useStyles = createStyles(({ token, css }) => ({
     font-weight: 600;
     margin-top: 16px;
     border: none;
-    background: linear-gradient(135deg, ${token.colorPrimary} 0%, ${token.colorPrimaryActive} 100%);
+    background: linear-gradient(
+      135deg,
+      ${token.colorPrimary} 0%,
+      ${token.colorPrimaryActive} 100%
+    );
     box-shadow: 0 4px 12px ${token.colorPrimaryHover}40;
     &:hover {
       box-shadow: 0 6px 16px ${token.colorPrimaryHover}60;
@@ -201,7 +210,10 @@ const Settings: React.FC = () => {
                     size={100}
                     src={avatarUrl}
                     icon={<UserOutlined />}
-                    style={{ border: `4px solid ${theme.colorBgContainer}`, boxShadow: theme.boxShadowTertiary }}
+                    style={{
+                      border: `4px solid ${theme.colorBgContainer}`,
+                      boxShadow: theme.boxShadowTertiary,
+                    }}
                   />
                   <div className={`avatar-mask ${styles.avatarMask}`}>
                     <CameraOutlined />
@@ -209,7 +221,13 @@ const Settings: React.FC = () => {
                 </div>
               </Tooltip>
             </Upload>
-            <div style={{ marginTop: 12, color: theme.colorTextDescription, fontSize: 12 }}>
+            <div
+              style={{
+                marginTop: 12,
+                color: theme.colorTextDescription,
+                fontSize: 12,
+              }}
+            >
               支持 JPG、PNG 格式，大小不超过 2MB
             </div>
           </div>
@@ -270,8 +288,10 @@ const Settings: React.FC = () => {
                 validator(_, value) {
                   const password = getFieldValue("userPassword");
                   if (!password) return Promise.resolve();
-                  if (!value) return Promise.reject(new Error("请确认您的密码"));
-                  if (password !== value) return Promise.reject(new Error("两次输入的密码不一致"));
+                  if (!value)
+                    return Promise.reject(new Error("请确认您的密码"));
+                  if (password !== value)
+                    return Promise.reject(new Error("两次输入的密码不一致"));
                   return Promise.resolve();
                 },
               }),
@@ -354,7 +374,14 @@ const Settings: React.FC = () => {
                 ),
               }}
             >
-              <h2 style={{ fontSize: 24, fontWeight: 700, marginBottom: 24, color: theme.colorTextHeading }}>
+              <h2
+                style={{
+                  fontSize: 24,
+                  fontWeight: 700,
+                  marginBottom: 24,
+                  color: theme.colorTextHeading,
+                }}
+              >
                 个人设置
               </h2>
               <Tabs

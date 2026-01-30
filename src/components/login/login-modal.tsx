@@ -62,7 +62,9 @@ const LoginModal: React.FC<LoginModalProps> = ({ open, onCancel }) => {
       console.error("登录错误:", error);
       let errorMessage = "登录失败，请重试";
       if (error && typeof error === "object" && "response" in error) {
-        const axiosError = error as { response?: { data?: { message?: string } } };
+        const axiosError = error as {
+          response?: { data?: { message?: string } };
+        };
         errorMessage = axiosError.response?.data?.message || errorMessage;
       } else if (error instanceof Error) {
         errorMessage = error.message;
@@ -100,7 +102,9 @@ const LoginModal: React.FC<LoginModalProps> = ({ open, onCancel }) => {
       console.error("注册错误:", error);
       let errorMessage = "注册失败，请重试";
       if (error && typeof error === "object" && "response" in error) {
-        const axiosError = error as { response?: { data?: { message?: string } } };
+        const axiosError = error as {
+          response?: { data?: { message?: string } };
+        };
         errorMessage = axiosError.response?.data?.message || errorMessage;
       } else if (error instanceof Error) {
         errorMessage = error.message;

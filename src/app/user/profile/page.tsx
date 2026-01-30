@@ -14,7 +14,11 @@ import {
   SafetyCertificateOutlined,
 } from "@ant-design/icons";
 import { useRouter } from "next/navigation";
-import { PageContainer, ProDescriptions, ProCard } from "@ant-design/pro-components";
+import {
+  PageContainer,
+  ProDescriptions,
+  ProCard,
+} from "@ant-design/pro-components";
 import { createStyles } from "antd-style";
 import { motion } from "framer-motion";
 
@@ -32,7 +36,11 @@ const useStyles = createStyles(({ token, css }) => ({
   `,
   banner: css`
     height: 180px;
-    background: linear-gradient(135deg, ${token.colorPrimary} 0%, ${token.colorPrimaryActive} 100%);
+    background: linear-gradient(
+      135deg,
+      ${token.colorPrimary} 0%,
+      ${token.colorPrimaryActive} 100%
+    );
     position: relative;
     display: flex;
     justify-content: center;
@@ -106,11 +114,19 @@ const Profile: React.FC = () => {
   const getRoleInfo = (role?: string) => {
     switch (role) {
       case "admin":
-        return { label: "管理员", color: "gold", icon: <SafetyCertificateOutlined /> };
+        return {
+          label: "管理员",
+          color: "gold",
+          icon: <SafetyCertificateOutlined />,
+        };
       case "user":
         return { label: "普通用户", color: "blue", icon: <UserOutlined /> };
       default:
-        return { label: "未知角色", color: "default", icon: <GlobalOutlined /> };
+        return {
+          label: "未知角色",
+          color: "default",
+          icon: <GlobalOutlined />,
+        };
     }
   };
 
@@ -142,7 +158,11 @@ const Profile: React.FC = () => {
                 <MailOutlined style={{ color: theme.colorPrimary }} />
                 {loginUser.userEmail || "未设置邮箱"}
               </div>
-              <Tag color={roleInfo.color} className={styles.tag} icon={roleInfo.icon}>
+              <Tag
+                color={roleInfo.color}
+                className={styles.tag}
+                icon={roleInfo.icon}
+              >
                 {roleInfo.label}
               </Tag>
 
@@ -158,7 +178,7 @@ const Profile: React.FC = () => {
               </div>
 
               <div className={styles.infoSection}>
-                <Divider orientation="left" style={{ borderColor: theme.colorBorderSecondary }}>
+                <Divider style={{ borderColor: theme.colorBorderSecondary }}>
                   账户详细信息
                 </Divider>
                 <ProDescriptions
@@ -169,12 +189,14 @@ const Profile: React.FC = () => {
                       title: "用户 ID",
                       dataIndex: "id",
                       render: (text) => (
-                        <code style={{
-                          background: theme.colorFillAlter,
-                          padding: '2px 6px',
-                          borderRadius: '4px',
-                          color: theme.colorTextSecondary
-                        }}>
+                        <code
+                          style={{
+                            background: theme.colorFillAlter,
+                            padding: "2px 6px",
+                            borderRadius: "4px",
+                            color: theme.colorTextSecondary,
+                          }}
+                        >
                           {text}
                         </code>
                       ),

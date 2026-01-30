@@ -21,9 +21,12 @@ export const loginUserSlice = createSlice({
   name: "loginUser",
   initialState: getInitialUser(),
   reducers: {
-    setLoginUser: (state, action: PayloadAction<API.LoginUserVO | undefined>) => {
+    setLoginUser: (
+      state,
+      action: PayloadAction<API.LoginUserVO | undefined>,
+    ) => {
       const user = action.payload || ({} as API.LoginUserVO);
-      
+
       if (typeof window !== "undefined") {
         if (Object.keys(user).length > 0) {
           localStorage.setItem(STORAGE_KEY, JSON.stringify(user));
@@ -31,7 +34,7 @@ export const loginUserSlice = createSlice({
           localStorage.removeItem(STORAGE_KEY);
         }
       }
-      
+
       return user;
     },
     clearLoginUser: (state) => {
