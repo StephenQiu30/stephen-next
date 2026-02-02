@@ -19,6 +19,8 @@ import { getLoginUser } from "@/api/userController";
 import menuConfig from "@/config/menu-config";
 import AvatarDropdown from "@/components/global-header/avatar-dropdown";
 
+import { ThemeProvider } from "antd-style";
+
 interface Props {
   children: React.ReactNode;
 }
@@ -93,111 +95,113 @@ const BasicLayout: React.FC<Props> = (props) => {
         },
       }}
     >
-      <ProLayout
-        layout="top"
-        contentWidth="Fixed"
-        fixedHeader={true}
-        token={{
-          pageContainer: {
-            paddingInlinePageContainerContent: 0,
-            paddingBlockPageContainerContent: 0,
-          },
-          header: {
-            colorBgHeader: "rgba(255, 255, 255, 0.8)",
-          },
-        }}
-        siderMenuType="group"
-        title={process.env.NEXT_PUBLIC_TITLE}
-        logo={
-          <Image
-            src={process.env.NEXT_PUBLIC_LOGO || "/logo.png"}
-            width={32}
-            height={32}
-            style={{ cursor: "pointer" }}
-            onClick={() => router.push("/")}
-            alt={process.env.NEXT_PUBLIC_TITLE || ""}
-          />
-        }
-        location={{ pathname: pathname ?? undefined }}
-        headerTitleRender={(logo) => (
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              cursor: "pointer",
-              transition: "all 0.3s ease",
-            }}
-            onClick={() => router.push("/")}
-          >
-            {logo}
-            <span
+      <ThemeProvider appearance={isDarkMode ? 'dark' : 'light'}>
+        <ProLayout
+          layout="top"
+          contentWidth="Fixed"
+          fixedHeader={true}
+          token={{
+            pageContainer: {
+              paddingInlinePageContainerContent: 0,
+              paddingBlockPageContainerContent: 0,
+            },
+            header: {
+              colorBgHeader: isDarkMode ? "rgba(20, 20, 20, 0.8)" : "rgba(255, 255, 255, 0.8)",
+            },
+          }}
+          siderMenuType="group"
+          title={process.env.NEXT_PUBLIC_TITLE}
+          logo={
+            <Image
+              src={process.env.NEXT_PUBLIC_LOGO || "/logo.png"}
+              width={32}
+              height={32}
+              style={{ cursor: "pointer" }}
+              onClick={() => router.push("/")}
+              alt={process.env.NEXT_PUBLIC_TITLE || ""}
+            />
+          }
+          location={{ pathname: pathname ?? undefined }}
+          headerTitleRender={(logo) => (
+            <div
               style={{
-                marginLeft: 12,
-                fontWeight: 700,
-                fontSize: 20,
-                background: "linear-gradient(135deg, #1677ff 0%, #0958d9 100%)",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
+                display: "flex",
+                alignItems: "center",
+                cursor: "pointer",
+                transition: "all 0.3s ease",
+              }}
+              onClick={() => router.push("/")}
+            >
+              {logo}
+              <span
+                style={{
+                  marginLeft: 12,
+                  fontWeight: 700,
+                  fontSize: 20,
+                  background: "linear-gradient(135deg, #1677ff 0%, #0958d9 100%)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                }}
+              >
+                {process.env.NEXT_PUBLIC_TITLE || "StephenQiu30"}
+              </span>
+            </div>
+          )}
+          footerRender={() => <GlobalFooter />}
+          menuDataRender={() => menuConfig}
+          actionsRender={(props) => {
+            if (props.isMobile) return [];
+            return (
+              <Space size="middle">
+                <Button
+                  type="text"
+                  icon={<SearchOutlined />}
+                  size="large"
+                  style={{
+                    borderRadius: 8,
+                    transition: "all 0.3s ease",
+                  }}
+                />
+                <Button
+                  type="text"
+                  icon={<GithubOutlined />}
+                  size="large"
+                  onClick={() =>
+                    window.open(process.env.NEXT_PUBLIC_GITHUB, "_blank")
+                  }
+                  style={{
+                    borderRadius: 8,
+                    transition: "all 0.3s ease",
+                  }}
+                />
+                <Button
+                  type="text"
+                  icon={isDarkMode ? <SunOutlined /> : <MoonOutlined />}
+                  size="large"
+                  onClick={() => setIsDarkMode(!isDarkMode)}
+                  style={{
+                    borderRadius: 8,
+                    transition: "all 0.3s ease",
+                  }}
+                />
+                <AvatarDropdown currentUser={loginUser} />
+              </Space>
+            );
+          }}
+          menuItemRender={(item, dom) => (
+            <Link
+              href={item.path || "/"}
+              style={{
+                transition: "all 0.3s ease",
               }}
             >
-              {process.env.NEXT_PUBLIC_TITLE || "StephenQiu30"}
-            </span>
-          </div>
-        )}
-        footerRender={() => <GlobalFooter />}
-        menuDataRender={() => menuConfig}
-        actionsRender={(props) => {
-          if (props.isMobile) return [];
-          return (
-            <Space size="middle">
-              <Button
-                type="text"
-                icon={<SearchOutlined />}
-                size="large"
-                style={{
-                  borderRadius: 8,
-                  transition: "all 0.3s ease",
-                }}
-              />
-              <Button
-                type="text"
-                icon={<GithubOutlined />}
-                size="large"
-                onClick={() =>
-                  window.open(process.env.NEXT_PUBLIC_GITHUB, "_blank")
-                }
-                style={{
-                  borderRadius: 8,
-                  transition: "all 0.3s ease",
-                }}
-              />
-              <Button
-                type="text"
-                icon={isDarkMode ? <SunOutlined /> : <MoonOutlined />}
-                size="large"
-                onClick={() => setIsDarkMode(!isDarkMode)}
-                style={{
-                  borderRadius: 8,
-                  transition: "all 0.3s ease",
-                }}
-              />
-              <AvatarDropdown currentUser={loginUser} />
-            </Space>
-          );
-        }}
-        menuItemRender={(item, dom) => (
-          <Link
-            href={item.path || "/"}
-            style={{
-              transition: "all 0.3s ease",
-            }}
-          >
-            {dom}
-          </Link>
-        )}
-      >
-        {children}
-      </ProLayout>
+              {dom}
+            </Link>
+          )}
+        >
+          {children}
+        </ProLayout>
+      </ThemeProvider>
     </ConfigProvider>
   );
 };

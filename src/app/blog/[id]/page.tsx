@@ -12,28 +12,28 @@ import MarkdownRender from "@/components/markdown/markdown-render";
 import MarkdownToc from "@/components/markdown/markdown-toc";
 
 const useStyles = createStyles(({ css, token, responsive }) => ({
-    pageContainer: css`
+  pageContainer: css`
     max-width: 1200px;
     margin: 0 auto;
     padding: 24px;
     position: relative;
   `,
-    layout: css`
+  layout: css`
     display: flex;
     gap: 48px;
-    align-items: flex-start;
+    // align-items: flex-start; // Removed to allow sidebar to stretch for sticky TOC
 
     ${responsive.mobile} {
       flex-direction: column;
       gap: 24px;
     }
   `,
-    mainContent: css`
+  mainContent: css`
     flex: 1;
     min-width: 0; /* Prevent overflow */
     width: 100%;
   `,
-    sidebar: css`
+  sidebar: css`
     width: 280px;
     flex-shrink: 0;
 
@@ -41,11 +41,11 @@ const useStyles = createStyles(({ css, token, responsive }) => ({
       display: none;
     }
   `,
-    header: css`
+  header: css`
     margin-bottom: 40px;
     text-align: center;
   `,
-    title: css`
+  title: css`
     font-size: 48px;
     font-weight: 800;
     margin-bottom: 16px;
@@ -62,7 +62,7 @@ const useStyles = createStyles(({ css, token, responsive }) => ({
       font-size: 32px;
     }
   `,
-    meta: css`
+  meta: css`
     color: ${token.colorTextSecondary};
     font-size: 14px;
     display: flex;
@@ -70,7 +70,7 @@ const useStyles = createStyles(({ css, token, responsive }) => ({
     justify-content: center;
     align-items: center;
   `,
-    tag: css`
+  tag: css`
     background: ${token.colorFillSecondary};
     padding: 4px 12px;
     border-radius: 20px;
@@ -80,66 +80,66 @@ const useStyles = createStyles(({ css, token, responsive }) => ({
 }));
 
 const BlogPostPage = () => {
-    const params = useParams();
-    const router = useRouter();
-    const id = params.id as string;
-    const { styles } = useStyles();
+  const params = useParams();
+  const router = useRouter();
+  const id = params.id as string;
+  const { styles } = useStyles();
 
-    // Fetch post details
-    const { data: postData, loading } = useRequest(async () => {
-        if (!id) return null;
-        return await getPostVoById({ id: id as unknown as number });
-    });
+  // Fetch post details
+  const { data: postData, loading } = useRequest(async () => {
+    if (!id) return null;
+    return await getPostVoById({ id: id as unknown as number });
+  });
 
-    const post = postData?.data;
+  const post = postData?.data;
 
-    return (
-        <div className={styles.pageContainer}>
-            <Spin spinning={loading} size="large">
-                {!loading && post ? (
-                    <>
-                        <header className={styles.header}>
-                            <div className={styles.meta}>
-                                {post.tags?.map((tag) => (
-                                    <span key={tag} className={styles.tag}>
-                                        {tag}
-                                    </span>
-                                ))}
-                                <span>{dayjs(post.createTime).format("YYYY年MM月DD日")}</span>
-                            </div>
-                            <h1 className={styles.title}>{post.title}</h1>
-                            <div className={styles.meta}>
-                                作者：{post.userVO?.userName || "Admin"}
-                            </div>
-                        </header>
+  return (
+    <div className={styles.pageContainer}>
+      <Spin spinning={loading} size="large">
+        {!loading && post ? (
+          <>
+            <header className={styles.header}>
+              <div className={styles.meta}>
+                {post.tags?.map((tag) => (
+                  <span key={tag} className={styles.tag}>
+                    {tag}
+                  </span>
+                ))}
+                <span>{dayjs(post.createTime).format("YYYY年MM月DD日")}</span>
+              </div>
+              <h1 className={styles.title}>{post.title}</h1>
+              <div className={styles.meta}>
+                作者：{post.userVO?.userName || "Admin"}
+              </div>
+            </header>
 
-                        <div className={styles.layout}>
-                            <main className={styles.mainContent}>
-                                <MarkdownRender>{post.content || ""}</MarkdownRender>
-                            </main>
+            <div className={styles.layout}>
+              <main className={styles.mainContent}>
+                <MarkdownRender>{post.content || ""}</MarkdownRender>
+              </main>
 
-                            <aside className={styles.sidebar}>
-                                <MarkdownToc markdown={post.content || ""} />
-                            </aside>
-                        </div>
-                    </>
-                ) : (
-                    !loading && (
-                        <Result
-                            status="404"
-                            title="404"
-                            subTitle="抱歉，您访问的文章不存在。"
-                            extra={
-                                <Button type="primary" onClick={() => router.push("/blog")}>
-                                    返回博客列表
-                                </Button>
-                            }
-                        />
-                    )
-                )}
-            </Spin>
-        </div>
-    );
+              <aside className={styles.sidebar}>
+                <MarkdownToc markdown={post.content || ""} />
+              </aside>
+            </div>
+          </>
+        ) : (
+          !loading && (
+            <Result
+              status="404"
+              title="404"
+              subTitle="抱歉，您访问的文章不存在。"
+              extra={
+                <Button type="primary" onClick={() => router.push("/blog")}>
+                  返回博客列表
+                </Button>
+              }
+            />
+          )
+        )}
+      </Spin>
+    </div>
+  );
 };
 
 export default BlogPostPage;

@@ -190,6 +190,63 @@ const useStyles = createStyles(({ css, token, isDarkMode }) => ({
         color: ${token.colorText};
       }
     }
+    /* Syntax Highlighting */
+    .hljs-comment,
+    .hljs-quote {
+      color: ${isDarkMode ? "#8b9eb5" : "#6a737d"};
+      font-style: italic;
+    }
+
+    .hljs-doctag,
+    .hljs-keyword,
+    .hljs-formula {
+      color: ${isDarkMode ? "#ff7b72" : "#d73a49"};
+    }
+
+    .hljs-section,
+    .hljs-name,
+    .hljs-selector-tag,
+    .hljs-deletion,
+    .hljs-subst {
+      color: ${isDarkMode ? "#79c0ff" : "#22863a"};
+    }
+
+    .hljs-literal {
+      color: ${isDarkMode ? "#79c0ff" : "#005cc5"};
+    }
+
+    .hljs-string,
+    .hljs-regexp,
+    .hljs-addition,
+    .hljs-attribute,
+    .hljs-meta-string {
+      color: ${isDarkMode ? "#a5d6ff" : "#032f62"};
+    }
+
+    .hljs-built_in,
+    .hljs-class .hljs-title {
+      color: ${isDarkMode ? "#d2a8ff" : "#6f42c1"};
+    }
+
+    .hljs-attr,
+    .hljs-variable,
+    .hljs-template-variable,
+    .hljs-type,
+    .hljs-selector-class,
+    .hljs-selector-attr,
+    .hljs-selector-pseudo,
+    .hljs-number {
+      color: ${isDarkMode ? "#79c0ff" : "#005cc5"};
+    }
+
+    .hljs-symbol,
+    .hljs-bullet,
+    .hljs-link,
+    .hljs-meta,
+    .hljs-selector-id,
+    .hljs-title {
+      color: ${isDarkMode ? "#d2a8ff" : "#6f42c1"};
+    }
   `,
 }));
 
@@ -234,24 +291,22 @@ const PreBlock = ({ children, ...props }: any) => {
   );
 };
 
-const MarkdownRender: React.FC<MarkdownRenderProps> = memo(
-  ({ children, className }) => {
-    const { styles, cx } = useStyles();
+const MarkdownRender: React.FC<MarkdownRenderProps> = ({ children, className }) => {
+  const { styles, cx } = useStyles();
 
-    return (
-      <div className={cx(styles.markdownContainer, className)}>
-        <ReactMarkdown
-          remarkPlugins={[remarkGfm]}
-          rehypePlugins={[rehypeHighlight, rehypeRaw, rehypeSlug]}
-          components={{
-            pre: PreBlock,
-          }}
-        >
-          {children}
-        </ReactMarkdown>
-      </div>
-    );
-  },
-);
+  return (
+    <div className={cx(styles.markdownContainer, className)}>
+      <ReactMarkdown
+        remarkPlugins={[remarkGfm]}
+        rehypePlugins={[rehypeHighlight, rehypeRaw, rehypeSlug]}
+        components={{
+          pre: PreBlock,
+        }}
+      >
+        {children}
+      </ReactMarkdown>
+    </div>
+  );
+};
 
 export default MarkdownRender;
