@@ -3,217 +3,140 @@
 import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState, AppDispatch } from "@/store";
-import { ProForm, ProFormText, PageContainer } from "@ant-design/pro-components";
-import { Button, Upload, Avatar, App, Tabs, Typography } from "antd";
+import { ProForm, PageContainer } from "@ant-design/pro-components";
+import { Button, App, Typography } from "antd";
 import {
-  SaveOutlined,
-  UserOutlined,
-  LockOutlined,
-  MailOutlined,
-  PhoneOutlined,
-  CameraOutlined,
-  SafetyOutlined,
   IdcardOutlined,
-  LoadingOutlined,
+  SafetyOutlined,
+  PhoneOutlined,
   RightOutlined
 } from "@ant-design/icons";
 import { updateMyUser, getLoginUser } from "@/api/userController";
-import { uploadFile } from "@/api/fileController";
 import { setLoginUser } from "@/store/modules";
 import { createStyles } from "antd-style";
 import { motion, AnimatePresence } from "framer-motion";
+import GlassCard from "@/components/glass-card";
+import BasicSettings from "@/components/settings/basic-settings";
+import SecuritySettings from "@/components/settings/security-settings";
+import ContactSettings from "@/components/settings/contact-settings";
 
-const { Title, Text } = Typography;
+const { Title } = Typography;
 
-const useStyles = createStyles(({ token, css, isDarkMode }) => ({
+const useStyles = createStyles(({ token, css, responsive }) => ({
   pageContainer: css`
-    max-width: 1000px;
+    max-width: 1200px;
     margin: 0 auto;
     padding: 40px 20px;
-    @media (max-width: 768px) {
+    
+    ${responsive.mobile} {
       padding: 16px;
     }
   `,
-  glassLayout: css`
+  layout: css`
     display: flex;
-    background: ${isDarkMode ? "rgba(28, 28, 30, 0.6)" : "rgba(255, 255, 255, 0.6)"};
-    backdrop-filter: blur(40px) saturate(180%);
-    -webkit-backdrop-filter: blur(40px) saturate(180%);
-    border-radius: 20px;
-    overflow: hidden;
-    border: 1px solid ${token.colorBorderSecondary};
-    box-shadow: 0 20px 40px -8px rgba(0,0,0,0.08);
-    min-height: 600px;
-    position: relative;
-    @media (max-width: 768px) {
+    gap: 40px;
+    align-items: flex-start;
+    
+    ${responsive.mobile} {
       flex-direction: column;
-      min-height: auto;
+      gap: 24px;
     }
   `,
   sidebar: css`
-    width: 260px;
-    background: ${isDarkMode ? "rgba(0,0,0,0.1)" : "rgba(245, 245, 247, 0.5)"};
-    border-right: 1px solid ${token.colorBorderSecondary};
-    padding: 32px 16px;
-    @media (max-width: 768px) {
+    width: 280px;
+    position: sticky;
+    top: 24px;
+    flex-shrink: 0;
+
+    ${responsive.mobile} {
       width: 100%;
-      border-right: none;
-      border-bottom: 1px solid ${token.colorBorderSecondary};
-      padding: 16px;
+      position: static;
       display: flex;
       overflow-x: auto;
-      gap: 8px;
-    }
-  `,
-  navTitle: css`
-    padding: 0 16px;
-    margin-bottom: 16px;
-    font-size: 24px;
-    font-weight: 700;
-    color: ${token.colorTextHeading};
-    @media (max-width: 768px) {
-       display: none;
+      gap: 12px;
+      padding-bottom: 4px;
+      
+      &::-webkit-scrollbar {
+        display: none;
+      }
     }
   `,
   navItem: css`
     display: flex;
     align-items: center;
     gap: 12px;
-    padding: 12px 16px;
-    margin-bottom: 4px;
+    padding: 16px 20px;
+    margin-bottom: 8px;
     border-radius: 12px;
     cursor: pointer;
     transition: all 0.2s;
     font-weight: 500;
-    color: ${token.colorText};
+    color: ${token.colorTextSecondary};
     font-size: 15px;
+    
     &:hover {
       background: ${token.colorFillTertiary};
+      color: ${token.colorText};
     }
+    
     &.active {
-      background: ${isDarkMode ? "rgba(255,255,255,0.1)" : "#FFFFFF"};
-      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      background: ${token.colorFillSecondary};
       color: ${token.colorPrimary};
       font-weight: 600;
     }
-    @media (max-width: 768px) {
-       margin-bottom: 0;
-       white-space: nowrap;
-       flex-shrink: 0;
+    
+    ${responsive.mobile} {
+      margin-bottom: 0;
+      white-space: nowrap;
+      padding: 10px 16px;
+      background: ${token.colorFillQuaternary};
+      border: 1px solid ${token.colorBorderSecondary};
+      
+      &.active {
+        background: ${token.colorPrimaryBg};
+        border-color: ${token.colorPrimaryBorder};
+      }
     }
   `,
   contentArea: css`
     flex: 1;
-    padding: 40px 60px;
-    position: relative;
-    @media (max-width: 768px) {
-      padding: 24px;
-    }
+    width: 100%;
+    min-width: 0; // Prevent flex item overflow
   `,
-  formGroup: css`
-    background: ${isDarkMode ? "rgba(44, 44, 46, 0.4)" : "#FFFFFF"};
-    border-radius: 16px;
-    overflow: hidden;
-    border: 1px solid ${token.colorBorderSecondary};
+  headerTitle: css`
     margin-bottom: 24px;
-  `,
-  formItem: css`
-    position: relative;
-    padding: 12px 20px;
-    display: flex;
-    align-items: center;
-    border-bottom: 1px solid ${token.colorBorderSecondary};
-    &:last-child {
-      border-bottom: none;
+    padding: 0 12px;
+    
+    ${responsive.mobile} {
+       display: none;
     }
-    .ant-form-item {
-      margin-bottom: 0;
-      flex: 1;
-    }
-    .ant-form-item-control-input {
-      min-height: auto;
-    }
-    .ant-input, .ant-input-password {
-      border: none !important;
-      background: transparent !important;
-      box-shadow: none !important;
-      padding: 0;
-      font-size: 16px;
-      text-align: right;
-      &:focus {
-         box-shadow: none !important;
-      }
-    }
-    .ant-input-affix-wrapper {
-        border: none !important;
-        background: transparent !important;
-        box-shadow: none !important;
-        padding: 0;
-        &:focus, &-focused {
-            box-shadow: none !important;
-        }
-    }
-  `,
-  itemLabel: css`
-    width: 100px;
-    flex-shrink: 0;
-    font-size: 15px;
-    font-weight: 500;
-    color: ${token.colorText};
-  `,
-  avatarUpload: css`
-    display: flex;
-    justify-content: center;
-    margin-bottom: 40px;
-  `,
-  avatarWrapper: css`
-    position: relative;
-    cursor: pointer;
-    transition: transform 0.2s;
-    &:hover {
-      transform: scale(1.05);
-      .mask {
-        opacity: 1;
-      }
-    }
-  `,
-  avatarMask: css`
-    position: absolute;
-    inset: 0;
-    background: rgba(0,0,0,0.4);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-size: 24px;
-    opacity: 0;
-    transition: opacity 0.2s;
-    backdrop-filter: blur(2px);
   `,
   saveButton: css`
-    position: absolute;
+    position: fixed;
     bottom: 40px;
-    right: 60px;
-    height: 44px;
+    right: 40px;
+    height: 50px;
     padding: 0 32px;
     border-radius: 999px;
-    box-shadow: 0 4px 14px ${token.colorPrimary}40;
+    box-shadow: 0 8px 20px ${token.colorPrimary}40;
     font-weight: 600;
-    @media (max-width: 768px) {
+    font-size: 16px;
+    z-index: 100;
+    
+    ${responsive.mobile} {
         position: static;
         width: 100%;
-        margin-top: 24px;
+        margin-top: 32px;
+        box-shadow: 0 4px 12px ${token.colorPrimary}30;
     }
   `
 }));
 
 const Settings: React.FC = () => {
-  const { styles, theme } = useStyles();
+  const { styles } = useStyles();
   const dispatch = useDispatch<AppDispatch>();
   const loginUser = useSelector((state: RootState) => state.loginUser);
   const [loading, setLoading] = useState(false);
-  const [uploading, setUploading] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState(loginUser?.userAvatar || "");
   const [activeTab, setActiveTab] = useState("basic");
   const [form] = ProForm.useForm();
@@ -226,33 +149,13 @@ const Settings: React.FC = () => {
         userAvatar: loginUser.userAvatar,
         userEmail: loginUser.userEmail,
         userPhone: loginUser.userPhone,
+
       });
       setAvatarUrl(loginUser.userAvatar || "");
     }
   }, [loginUser, form]);
 
   if (!loginUser?.id) return null;
-
-  const handleAvatarUpload = async (file: File) => {
-    try {
-      setUploading(true);
-      const formData = new FormData();
-      formData.append("file", file);
-      const res: any = await uploadFile({ biz: "user_avatar" }, formData);
-      if (res.code === 0 && res.data) {
-        setAvatarUrl(res.data);
-        form.setFieldValue("userAvatar", res.data);
-        message.success("头像更新成功");
-      } else {
-        message.error(res.message || "上传失败");
-      }
-    } catch (error) {
-      message.error("上传错误");
-    } finally {
-      setUploading(false);
-    }
-    return null;
-  };
 
   const handleSubmit = async (values: any) => {
     try {
@@ -285,136 +188,28 @@ const Settings: React.FC = () => {
     { key: "contact", label: "联系方式", icon: <PhoneOutlined /> },
   ];
 
-  const renderContent = () => {
-    return (
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={activeTab}
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: -20 }}
-          transition={{ duration: 0.2 }}
-        >
-          {activeTab === "basic" && (
-            <>
-              <div className={styles.avatarUpload}>
-                <Upload
-                  showUploadList={false}
-                  beforeUpload={(file) => { handleAvatarUpload(file); return false; }}
-                  disabled={uploading}
-                >
-                  <div className={styles.avatarWrapper}>
-                    <Avatar size={100} src={avatarUrl} icon={<UserOutlined />} />
-                    <div className={`mask ${styles.avatarMask}`}>
-                      {uploading ? <LoadingOutlined /> : <CameraOutlined />}
-                    </div>
-                  </div>
-                </Upload>
-              </div>
-              <div className={styles.formGroup}>
-                <div className={styles.formItem}>
-                  <span className={styles.itemLabel}>用户昵称</span>
-                  <ProFormText name="userAvatar" hidden />
-                  <ProFormText
-                    name="userName"
-                    placeholder="输入昵称"
-                    fieldProps={{
-                      style: { textAlign: 'right' }
-                    }}
-                    rules={[{ required: true, message: "请输入昵称" }]}
-                  />
-                </div>
-              </div>
-            </>
-          )}
-
-          {activeTab === "security" && (
-            <div className={styles.formGroup}>
-              <div className={styles.formItem}>
-                <span className={styles.itemLabel}>新密码</span>
-                <ProFormText.Password
-                  name="userPassword"
-                  placeholder="未更改"
-                  fieldProps={{
-                    style: { textAlign: 'right' }
-                  }}
-                />
-              </div>
-              <div className={styles.formItem}>
-                <span className={styles.itemLabel}>确认密码</span>
-                <ProFormText.Password
-                  name="checkPassword"
-                  placeholder="再次输入"
-                  dependencies={["userPassword"]}
-                  fieldProps={{
-                    style: { textAlign: 'right' }
-                  }}
-                  rules={[
-                    ({ getFieldValue }) => ({
-                      validator(_, value) {
-                        if (!value && getFieldValue("userPassword")) {
-                          return Promise.reject(new Error("请确认密码"));
-                        }
-                        if (value && value !== getFieldValue("userPassword")) {
-                          return Promise.reject(new Error("密码不一致"));
-                        }
-                        return Promise.resolve();
-                      },
-                    }),
-                  ]}
-                />
-              </div>
-            </div>
-          )}
-
-          {activeTab === "contact" && (
-            <div className={styles.formGroup}>
-              <div className={styles.formItem}>
-                <span className={styles.itemLabel}>邮箱</span>
-                <ProFormText
-                  name="userEmail"
-                  placeholder="example@mail.com"
-                  fieldProps={{
-                    style: { textAlign: 'right' }
-                  }}
-                  rules={[{ type: 'email', message: "邮箱格式错误" }]}
-                />
-              </div>
-              <div className={styles.formItem}>
-                <span className={styles.itemLabel}>手机</span>
-                <ProFormText
-                  name="userPhone"
-                  placeholder="13800000000"
-                  fieldProps={{
-                    style: { textAlign: 'right' }
-                  }}
-                />
-              </div>
-            </div>
-          )}
-        </motion.div>
-      </AnimatePresence>
-    );
-  };
-
   return (
     <PageContainer title={false} ghost>
       <div className={styles.pageContainer}>
-        <div className={styles.glassLayout}>
+        <div className={styles.layout}>
           {/* Sidebar */}
           <div className={styles.sidebar}>
-            <div className={styles.navTitle}>设置</div>
-            {menuItems.map(item => (
-              <div
-                key={item.key}
-                className={`${styles.navItem} ${activeTab === item.key ? 'active' : ''}`}
-                onClick={() => setActiveTab(item.key)}
-              >
-                {item.icon}
-                {item.label}
-                {activeTab === item.key && <RightOutlined style={{ marginLeft: "auto", fontSize: 12, opacity: 0.5 }} />}
-              </div>
-            ))}
+            <div className={styles.headerTitle}>
+              <Title level={3} style={{ margin: 0 }}>账户设置</Title>
+            </div>
+            <GlassCard style={{ padding: 8 }}>
+              {menuItems.map(item => (
+                <div
+                  key={item.key}
+                  className={`${styles.navItem} ${activeTab === item.key ? 'active' : ''}`}
+                  onClick={() => setActiveTab(item.key)}
+                >
+                  <span style={{ fontSize: 18 }}>{item.icon}</span>
+                  <span>{item.label}</span>
+                  {activeTab === item.key && <RightOutlined style={{ marginLeft: "auto", fontSize: 12, opacity: 0.5 }} />}
+                </div>
+              ))}
+            </GlassCard>
           </div>
 
           {/* Main Content */}
@@ -423,15 +218,35 @@ const Settings: React.FC = () => {
               form={form}
               onFinish={handleSubmit}
               submitter={{ render: () => null }}
-              layout="horizontal"
+              layout="vertical"
             >
-              {renderContent()}
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={activeTab}
+                  initial={{ opacity: 0, x: 10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -10 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  {activeTab === "basic" && (
+                    <BasicSettings
+                      loginUser={loginUser}
+                      form={form}
+                      setAvatarUrl={setAvatarUrl}
+                      avatarUrl={avatarUrl}
+                    />
+                  )}
+                  {activeTab === "security" && <SecuritySettings />}
+                  {activeTab === "contact" && <ContactSettings />}
+                </motion.div>
+              </AnimatePresence>
 
               <Button
                 type="primary"
                 htmlType="submit"
                 loading={loading}
                 className={styles.saveButton}
+                size="large"
               >
                 保存更改
               </Button>

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { Input, Segmented, Tooltip, theme } from "antd";
 import { createStyles } from "antd-style";
 import {
@@ -15,7 +15,7 @@ import {
   CodeOutlined,
   PictureOutlined,
 } from "@ant-design/icons";
-import MarkdownRender from "./markdown-render";
+import MarkdownRender from "@/components/markdown/markdown-render";
 
 const { TextArea } = Input;
 const { useToken } = theme;
@@ -31,11 +31,17 @@ const useStyles = createStyles(({ css, token }) => ({
     background: ${token.colorBgContainer};
     overflow: hidden;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+    transition: all 0.2s ease-in-out;
+    
+    &:focus-within {
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+      border-color: ${token.colorPrimary};
+    }
   `,
   toolbar: css`
     padding: 12px 16px;
     border-bottom: 1px solid ${token.colorBorderSecondary};
-    background: ${token.colorBgLayout}; // Slightly distinctive background
+    background: ${token.colorBgLayout};
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -52,6 +58,7 @@ const useStyles = createStyles(({ css, token }) => ({
     display: flex;
     align-items: center;
     gap: 4px;
+    flex-wrap: wrap;
   `,
   toolButton: css`
     width: 32px;
@@ -68,13 +75,17 @@ const useStyles = createStyles(({ css, token }) => ({
       background: ${token.colorFillTertiary};
       color: ${token.colorText};
     }
+    
+    &:active {
+      background: ${token.colorFillSecondary};
+    }
   `,
   mainArea: css`
     flex: 1;
     display: flex;
     overflow: hidden;
     position: relative;
-    min-height: 500px; // Default height if not constrained by parent
+    min-height: 500px;
   `,
   editorPane: css`
     flex: 1;
@@ -126,17 +137,35 @@ const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
   onChange,
   height = 600,
 }) => {
-  const { styles, cx } = useStyles();
+  const { styles } = useStyles();
   const [viewMode, setViewMode] = useState<ViewMode>("split");
   const { token } = useToken();
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  const handleInsert = (marker: string, suffix: string = "") => {
-    // Ideally this would use a ref to the textarea to insert at cursor position
-    // For now, simpler implementation - append to end (or user can build specific ref logic)
-    // To keep it simple and robust without heavy dependencies, we'll just focus on layout for now
-    // If complex editing logic is needed, we would need a more robust editor core (like monaco or codemirror)
-    // Here we append for demonstration, or could just notify user "Cursor insertion requires ref implementation"
-    onChange(value + `${marker}Text${suffix}`);
+  // Helper to insert text at cursor position
+  const handleInsert = (prefix: string, suffix: string = "") => {
+    const textarea = textareaRef.current;
+    if (!textarea) return;
+
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const text = value;
+
+    const before = text.substring(0, start);
+    const selected = text.substring(start, end);
+    const after = text.substring(end);
+
+    const newValue = `${before}${prefix}${selected}${suffix}${after}`;
+    onChange(newValue);
+
+    // Restore cursor position and selection
+    setTimeout(() => {
+      textarea.focus();
+      textarea.setSelectionRange(
+        start + prefix.length,
+        end + prefix.length
+      );
+    }, 0);
   };
 
   return (
@@ -227,9 +256,10 @@ const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
             style={{ maxWidth: viewMode === "split" ? "50%" : "100%" }}
           >
             <TextArea
+              ref={textareaRef}
               value={value}
               onChange={(e) => onChange(e.target.value)}
-              placeholder="Start writing..."
+              placeholder="Start writing your amazing story..."
             />
           </div>
         )}
