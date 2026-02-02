@@ -7,7 +7,7 @@ import { Typography, Tag, Spin, Input, Empty } from "antd";
 import { useRequest } from "ahooks";
 import dayjs from "dayjs";
 import { searchPostVoByPage } from "@/api/searchController";
-import GlassCard from "@/components/glass-card";
+
 import BlogCard from "@/components/blog/blog-card";
 import { SearchOutlined } from "@ant-design/icons";
 

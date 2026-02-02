@@ -5,7 +5,7 @@ import { Button, ConfigProvider, Space, Spin, theme } from "antd";
 import {
   GithubOutlined,
   MoonOutlined,
-  SearchOutlined,
+
   SunOutlined,
 } from "@ant-design/icons";
 import Image from "next/image";
@@ -153,15 +153,7 @@ const BasicLayout: React.FC<Props> = (props) => {
             if (props.isMobile) return [];
             return (
               <Space size="middle">
-                <Button
-                  type="text"
-                  icon={<SearchOutlined />}
-                  size="large"
-                  style={{
-                    borderRadius: 8,
-                    transition: "all 0.3s ease",
-                  }}
-                />
+
                 <Button
                   type="text"
                   icon={<GithubOutlined />}

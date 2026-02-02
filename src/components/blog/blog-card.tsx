@@ -2,11 +2,11 @@
 
 import React from "react";
 import Link from "next/link";
-import { Typography, Tag, Space, Image } from "antd";
+import { Typography, Tag, Space, Image, Card } from "antd";
 import { createStyles } from "antd-style";
 import dayjs from "dayjs";
 import { EyeOutlined, LikeOutlined, StarOutlined } from "@ant-design/icons";
-import GlassCard from "@/components/glass-card";
+
 
 const { Title, Paragraph } = Typography;
 
@@ -165,7 +165,7 @@ const BlogCard: React.FC<BlogCardProps> = ({ post }) => {
 
   return (
     <Link href={`/blog/${post.id}`} style={{ textDecoration: "none", height: "100%", display: "block" }}>
-      <GlassCard className={styles.card} hoverable>
+      <Card className={styles.card} hoverable>
         {/* Cover Image or Placeholder */}
         <div className={styles.coverWrapper}>
           {post.cover ? (
@@ -217,7 +217,7 @@ const BlogCard: React.FC<BlogCardProps> = ({ post }) => {
             </div>
           </div>
         </div>
-      </GlassCard>
+      </Card>
     </Link>
   );
 };

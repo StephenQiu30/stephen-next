@@ -1,14 +1,14 @@
 "use client";
 
 import React from "react";
-import { Button, Typography, Row, Col, Space, ConfigProvider } from "antd";
+import { Button, Typography, Row, Col, Space, ConfigProvider, Card } from "antd";
 import { GithubOutlined, ArrowRightOutlined, RightOutlined } from "@ant-design/icons";
 import { createStyles, keyframes } from "antd-style";
 import Image from "next/image";
 import Link from "next/link";
 import { useRequest } from "ahooks";
 import { listPostVoByPage } from "@/api/postController";
-import GlassCard from "@/components/glass-card";
+
 import dayjs from "dayjs";
 
 const { Title, Text, Paragraph } = Typography;
@@ -343,12 +343,12 @@ export default function Home() {
             <Col xs={24} lg={12}>
               <div className={styles.heroImageWrapper}>
                 {/* Placeholder for hero image - using a glass card as placeholder representation */}
-                <GlassCard className={styles.heroImage} style={{ minHeight: "400px", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <Card className={styles.heroImage} style={{ minHeight: "400px", display: "flex", alignItems: "center", justifyContent: "center" }}>
                   <div style={{ textAlign: "center", opacity: 0.5 }}>
                     <div style={{ fontSize: "80px", marginBottom: "16px" }}>🎨</div>
                     <div style={{ fontSize: "24px", fontWeight: "600" }}>Creative Space</div>
                   </div>
-                </GlassCard>
+                </Card>
               </div>
             </Col>
           </Row>
@@ -369,7 +369,7 @@ export default function Home() {
             <div className={styles.grid}>
               {posts.map((post) => (
                 <Link href={`/blog/${post.id}`} key={post.id} style={{ textDecoration: "none" }}>
-                  <GlassCard className={styles.featureCard} hoverable>
+                  <Card className={styles.featureCard} hoverable>
                     <div className={styles.featureContent}>
                       <div className={styles.featureDate}>
                         {dayjs(post.createTime).format("MMM DD, YYYY")}
@@ -384,7 +384,7 @@ export default function Home() {
                         Read Article <ArrowRightOutlined />
                       </div>
                     </div>
-                  </GlassCard>
+                  </Card>
                 </Link>
               ))}
             </div>
